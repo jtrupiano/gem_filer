@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+require '/Users/john/projects/gemfile/detect_gems'
+GemFiler.init(:gemfile => "new_Gemfile")
+require File.dirname(__FILE__) + '/../config/boot'
+GemFiler.generate_gemfile
