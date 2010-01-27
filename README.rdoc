@@ -1,0 +1,34 @@
+= gemfiler =
+
+gemfiler allows you to generate a dependency manifest (output in bundler's 
+Gemfile format) for existing codebases.  I find it particularly useful
+when forking other folks' ruby OSS projects.  After I finally get all of
+their development dependencies installed (through trial and errror and 
+sheer persistence), I can contribute back a Gemfile for those forkers
+that follow after me.
+
+== Usage ==
+
+Supported CLI options:
+
+  $> gemfiler [OPTIONS]
+    -r, --ruby FILE                  Use ruby instead of rake
+        --rails                      Use config/boot.rb instead of rake
+    -o, --out FILE                   name of Gemfile to output
+    -t, --task RAKE_TASK             Specify rake task to invoke instead of :default
+
+Find the dependencies for a specific ruby program:
+
+  $> gemfiler -r timecop.rb
+    Adding rack 1.0.1
+  $>less Gemfile
+    gem 'rack', '= 1.0.1'
+    
+Find the dependencies for a rails project:
+
+  $> gemfiler --rails
+  
+Find the dependencies for the test environment for a rails project:
+  
+  $> RAILS_ENV=test gemfiler --rails
+  
