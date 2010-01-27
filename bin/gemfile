@@ -1,20 +1,40 @@
 #!/usr/bin/env ruby
-require '/Users/john/projects/gemfile/gem_filer'
-require 'rake'
+require File.join(File.dirname(__FILE__), "..", "gem_filer")
+require 'optparse'
 
-def gemfile
-  'test'
+options = {
+  :invocation_type => :rake,
+  :gemfile => 'Gemfile',
+  :rakefile => 'Rakefile',
+  :rake_task => 'default',
+  :ruby_file => 'config/boot.rb'
+}
+
+OptionParser.new do |opts|
+  opts.on("-r", "--ruby FILE", "Use ruby instead of rake") do |file|
+    options[:invocation_type] = :ruby
+    options[:ruby_file] = file
+  end
+  opts.on("--rails", "Use config/boot.rb instead of rake") do
+    options[:invocation_type] = :ruby
+  end
+  opts.on("-o", "--out FILE", "name of Gemfile to output") do |file|
+    options[:gemfile] = file
+  end
+  opts.on("-t", "--task RAKE_TASK", "Specify rake task to invoke instead of :default") do |task|
+    options[:rake_task] = task
+  end
+end.parse!
+
+case options[:invocation_type]
+when :rake
+  require 'rake'
+  GemFiler.init(:gemfile => options[:gemfile])
+  load options[:rakefile]
+  Rake::Task[options[:rake_task]].invoke
+  GemFiler.generate_gemfile
+when :ruby
+  GemFiler.init(:gemfile => options[:gemfile])
+  require options[:ruby_file]
+  GemFiler.generate_gemfile
 end
-
-def rake_task
-  'test'
-end
-
-def rakefile
-  'Rakefile'
-end
-
-GemFiler.init(:gemfile => gemfile)
-load rakefile
-Rake::Task[rake_task].invoke
-GemFiler.generate_gemfile

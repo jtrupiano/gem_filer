@@ -22,10 +22,3 @@ class GemFiler
     end
   end
 end
-
-if $0 == __FILE__
-  GemFiler.init
-  require 'tzinfo'
-  require 'treetop'
-  GemFiler.generate_gemfile
-end
