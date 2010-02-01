@@ -17,6 +17,10 @@ Supported CLI options:
     -o, --out FILE                   name of Gemfile to output
     -t, --task RAKE_TASK             Specify rake task to invoke instead of :default
 
+Find the dependencies for a rake task:
+
+  $> gemfiler -t a_task
+
 Find the dependencies for a specific ruby program:
 
   $> gemfiler -r timecop.rb
@@ -32,3 +36,13 @@ Find the dependencies for the test environment for a rails project:
   
   $> RAILS_ENV=test gemfiler --rails
   
+== Shortcomings
+
+gemfiler cannot currently be used with rails' "rake test" command.  This is 
+due to the fact that this task spawns new threads to run each of your test
+suites.  gemfiler can only track those gems activated in a single thread.
+
+gemfiler still needs to be wrapped up into a gem.  I have been considering
+writing a framework to on-the-fly allow you to install missing dependencies.
+You can find this endeavor in hot_installer.rb.  Thanks go out to Avdi
+Grimm and his work on hammertime as the inspiration for hot_installer.
