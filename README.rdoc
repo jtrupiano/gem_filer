@@ -1,4 +1,4 @@
-= gemfiler =
+= gemfiler
 
 gemfiler allows you to generate a dependency manifest (output in bundler's 
 Gemfile format) for existing codebases.  I find it particularly useful
@@ -7,7 +7,7 @@ their development dependencies installed (through trial and errror and
 sheer persistence), I can contribute back a Gemfile for those forkers
 that follow after me.
 
-== Usage ==
+== Usage
 
 Supported CLI options:
 
