@@ -1,11 +1,15 @@
-= gemfiler
+= gem_filer
 
-gemfiler allows you to generate a dependency manifest (output in bundler's 
+gem_filer allows you to generate a dependency manifest (output in bundler's 
 Gemfile format) for existing codebases.  I find it particularly useful
 when forking other folks' ruby OSS projects.  After I finally get all of
 their development dependencies installed (through trial and errror and 
 sheer persistence), I can contribute back a Gemfile for those forkers
 that follow after me.
+
+gem_filer is in the very early stages of development and in fact may never
+see a real release.  Developing it has served as an exercise in better
+understanding RubyGems and Bundler.
 
 == Usage
 
@@ -35,14 +39,23 @@ Find the dependencies for a rails project:
 Find the dependencies for the test environment for a rails project:
   
   $> RAILS_ENV=test gemfiler --rails
+
+== Programmatic Usage
+
+gem_filer can be used programmatically to interrogate arbitrary ruby code.
+
+  require '/path/to/gem_filer' # include gem_filer.rb at the root of the rep
+  GemFiler.init(:gemfile => '/path/and/file/name')
+  # do whatever you want here
+  GemFiler.generate_gemfile
   
 == Shortcomings
 
-gemfiler cannot currently be used with rails' "rake test" command.  This is 
+gem_filer cannot currently be used with rails' "rake test" command.  This is 
 due to the fact that this task spawns new threads to run each of your test
-suites.  gemfiler can only track those gems activated in a single thread.
+suites.  gem_filer can only track those gems activated in a single thread.
 
-gemfiler still needs to be wrapped up into a gem.  I have been considering
+gem_filer still needs to be wrapped up into a gem.  I have been considering
 writing a framework to on-the-fly allow you to install missing dependencies.
 You can find this endeavor in hot_installer.rb.  Thanks go out to Avdi
 Grimm and his work on hammertime as the inspiration for hot_installer.
