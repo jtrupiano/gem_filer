@@ -1,0 +1,3 @@
+We can try unwinding the no-ruby-debug stuff.  Commenting out the entirety of 
+the irb command in ruby-debug seemed to be working there for a moment.  
+Should revisit.

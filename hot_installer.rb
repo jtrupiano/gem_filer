@@ -1,5 +1,5 @@
 require 'highline'
-require 'ruby-debug'
+# require 'ruby-debug'
 require 'rubygems/gem_runner'
 
 module HotInstaller
@@ -36,30 +36,45 @@ module HotInstaller
   
   # Manipulate error and backtrace information into a more
   # useful form
-  def raise(*args)
-    backtrace = caller(2)
-    error, backtrace = 
-      case args.size
-      when 0 then [($!.nil? ? RuntimeError.new : $!), backtrace]
-      when 1 then 
-        if args[0].is_a?(String) 
-          [RuntimeError.exception(args[0]), backtrace]
-        else
-          [args[0].exception, backtrace]
-        end
-      when 2 then
-        [args[0].exception(args[1]), backtrace]
-      when 3 then
-        [args[0].exception(args[1]), args[2]]
-      else
-        super(ArgumentError, "wrong number of arguments", backtrace)
-      end
-    error.set_backtrace(backtrace)
-    
-    if error.is_a?(LoadError)
+  # def raise(*args)
+  #   backtrace = caller(2)
+  #   error, backtrace = 
+  #     case args.size
+  #     when 0 then [($!.nil? ? RuntimeError.new : $!), backtrace]
+  #     when 1 then 
+  #       if args[0].is_a?(String) 
+  #         [RuntimeError.exception(args[0]), backtrace]
+  #       else
+  #         [args[0].exception, backtrace]
+  #       end
+  #     when 2 then
+  #       [args[0].exception(args[1]), backtrace]
+  #     when 3 then
+  #       [args[0].exception(args[1]), args[2]]
+  #     else
+  #       super(ArgumentError, "wrong number of arguments", backtrace)
+  #     end
+  #   error.set_backtrace(backtrace)
+  #   
+  #   if error.is_a?(LoadError)
+  #     gem_name = parse_load_error(error)
+  #     ask_about_download(gem_name)
+  #   end
+  # end
+  
+  alias_method :require_without_hot_installer, :require
+  def require(path)
+    begin
+      require_without_hot_installer(path)
+    rescue LoadError => error
       gem_name = parse_load_error(error)
+      raise error if ignore_gem?(gem_name)
       ask_about_download(gem_name)
     end
+  end
+  
+  def ignore_gem?(name)
+    "Win32API" == name
   end
   
   # Extract the filename from a LoadError.
@@ -120,7 +135,8 @@ module HotInstaller
       gems.each do |a_gem|
         menu.choice "gem install #{a_gem.to_install_string}" do
           begin
-            gem_runner.run(a_gem.to_gem_runner_args)
+            puts a_gem.to_gem_runner_args.inspect
+            ::Gem::GemRunner.new.run(a_gem.to_gem_runner_args)
           rescue error
             puts error.backtrace
           end
@@ -156,7 +172,7 @@ end
 
 class ::Object
   include ::HotInstaller
-  Debugger.start
+  # Debugger.start
 end
 
 
