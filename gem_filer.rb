@@ -3,7 +3,7 @@ require 'rubygems'
 class GemFiler
   class << self
     def init(options={})
-      @gemfile = options.delete(:gemfile) || "Gemfile"
+      @gemfile = options.fetch(:gemfile, "Gemfile")
       @initial_specs = Gem.loaded_specs.dup
     end
     
