@@ -7,6 +7,9 @@ class GemFiler
       @initial_specs = Gem.loaded_specs.dup
     end
     
+    # Ignore gems either 
+    #     (a) loaded prior to GemFiler, or
+    #     (b) loaded by GemFiler
     def should_ignore_gem?(gem_name, spec)
       @initial_specs.keys.include?(gem_name)
     end

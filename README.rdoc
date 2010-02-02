@@ -18,7 +18,7 @@ Supported CLI options:
   $> gemfiler [OPTIONS]
     -r, --ruby FILE                  Use ruby instead of rake
         --rails                      Use config/boot.rb instead of rake
-    -o, --out FILE                   name of Gemfile to output
+    -o, --out FILE                   name of Gemfile to output: defaults to Gemfile
     -t, --task RAKE_TASK             Specify rake task to invoke instead of :default
 
 Find the dependencies for a rake task:

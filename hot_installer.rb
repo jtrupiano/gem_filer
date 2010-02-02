@@ -2,22 +2,40 @@ require 'highline'
 require 'ruby-debug'
 require 'rubygems/gem_runner'
 
-module GemFiler
+module HotInstaller
+
+  # Holds name, version and source information about a gem.
   class Gem
     attr_accessor :name, :version, :source
+
+    # new Gem data structure. The argument version should
+    # respond_to? :version
     def initialize(name, version, source)
       @name, @version, @source = name, version, source
     end
     
+    # convert to a space separated string
     def to_s
       "#{name} #{version.version} #{source}"
     end
     
+    # Produce output in the form of arguments to the gem 
+    # command
     def to_install_string
       "#{name} -v#{version.version} --source #{source}"
     end
+
+    # Produce a list of arguments which may be passed to 
+    # gem_runner.run
+    def to_gem_runner_args
+      return ["install", name,
+              "--version", version.version,
+              "--source", source]
+    end
   end
   
+  # Manipulate error and backtrace information into a more
+  # useful form
   def raise(*args)
     backtrace = caller(2)
     error, backtrace = 
@@ -44,10 +62,12 @@ module GemFiler
     end
   end
   
+  # Extract the filename from a LoadError.
   def parse_load_error(error)
     /^no such file to load -- (.*)$/.match(error.message)[1]
   end
 
+  # Ask the user about #gem_name which cannot be found.
   def ask_about_download(gem_name)
     c = get_gemfiler_console
     c.say "\n"
@@ -87,6 +107,7 @@ module GemFiler
     continue = c.choose(&menu_config) until continue
   end
   
+  # Ask the user about installing #gems
   def ask_about_gems(gems)
     c = get_gemfiler_console
     c.say "\n"
@@ -99,7 +120,7 @@ module GemFiler
       gems.each do |a_gem|
         menu.choice "gem install #{a_gem.to_install_string}" do
           begin
-            gem_runner.run(["install", a_gem.name, "--version", a_gem.version.version, "--source", a_gem.source])
+            gem_runner.run(a_gem.to_gem_runner_args)
           rescue error
             puts error.backtrace
           end
@@ -119,20 +140,22 @@ module GemFiler
   end
   
   def gem_runner
-    @gem_runner = ::Gem::GemRunner.new
+    @gem_runner ||= ::Gem::GemRunner.new
   end
   
+  # Search for gems matching #gem_name, and add their information
+  # to the collection.
   def search_for_gems(gem_name)
     gems = gem_fetcher.find_matching(::Gem::Dependency.new(gem_name, nil))
     gems.map {|gem|
-      GemFiler::Gem.new(gem[0][0], gem[0][1], gem[1])
+      HotInstaller::Gem.new(gem[0][0], gem[0][1], gem[1])
     }
   end
   
 end
 
 class ::Object
-  include ::GemFiler
+  include ::HotInstaller
   Debugger.start
 end
 
